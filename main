@@ -10,9 +10,9 @@ async def on_ready():
     print(f'Logged in as {bot.user.name} ({bot.user.id})')
     print('-----')
 
-    guild_id = 1108190589775785994  # Replace with your guild ID
-    channel_id = 1108190590455271506  # Replace with your channel ID
-    message_id = 1108254252599607327  # Replace with your message ID
+    guild_id = guild_id  # Replace with your guild ID
+    channel_id = channel_id  # Replace with your channel ID
+    message_id = message_id  # Replace with your message ID
 
     guild = bot.get_guild(guild_id)
     channel = bot.get_channel(channel_id)
@@ -27,7 +27,7 @@ async def on_ready():
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    if payload.message_id == 1108254252599607327:  # Replace YOUR_MESSAGE_ID
+    if payload.message_id == message_id:  # Replace YOUR_MESSAGE_ID
         guild = bot.get_guild(payload.guild_id)
         member = guild.get_member(payload.user_id)
 
