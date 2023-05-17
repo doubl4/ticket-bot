@@ -1,0 +1,56 @@
+import discord
+
+intents = discord.Intents.default()
+intents.messages = True
+
+bot = discord.Client(intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user.name} ({bot.user.id})')
+    print('-----')
+
+    guild_id = 1108190589775785994  # Replace with your guild ID
+    channel_id = 1108190590455271506  # Replace with your channel ID
+    message_id = 1108254252599607327  # Replace with your message ID
+
+    guild = bot.get_guild(guild_id)
+    channel = bot.get_channel(channel_id)
+
+    if guild is not None and channel is not None:
+        try:
+            message = await channel.fetch_message(message_id)
+            await message.add_reaction('✉️')
+            print('Automatic reaction added to the message.')
+        except discord.NotFound:
+            print('Message not found.')
+
+@bot.event
+async def on_raw_reaction_add(payload):
+    if payload.message_id == 1108254252599607327:  # Replace YOUR_MESSAGE_ID
+        guild = bot.get_guild(payload.guild_id)
+        member = guild.get_member(payload.user_id)
+
+        if member is None:
+            try:
+                member = await guild.fetch_member(payload.user_id)
+            except discord.NotFound:
+                print(f"Member not found: {payload.user_id}")
+                return
+
+        channel = bot.get_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
+
+        if payload.emoji.name == '✉️':
+            category = discord.utils.get(guild.categories, name='Tickets')
+
+            if category is None:
+                category = await guild.create_category(name='Tickets')
+
+            ticket_channel = await category.create_text_channel(name=f'ticket-{member.name}')
+            await ticket_channel.set_permissions(member, read_messages=True, send_messages=True)
+            await ticket_channel.set_permissions(guild.default_role, read_messages=False)
+
+            await ticket_channel.send(f'{member.mention}, your ticket channel has been created: {ticket_channel.mention}')
+
+bot.run('MTEwODE5MDkxODAzMDQwOTc1OA.GLFsAn.adEvmhswov6N6HAVeg1ahOnJiBt3vP9rtS2QQQ')
